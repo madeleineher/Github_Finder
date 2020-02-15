@@ -1,74 +1,78 @@
-import React, { Component } from 'react';
-// importing searchUsers as a proptype
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-// usually when we have a form in react we are going to want to attach state
-// to the input.
+// now we are passing in our props through the function parameters , also no need for destructuring
+const Search = ({ searchUsers, showClear, clearUsers, setAlert }) => {
+  // we can no longer do this, as in bring in state since it is a function based component,
+  // NOW we bring in useState hook from 'react' like in line 1.
+  // state = {
+  //   text: ''
+  // };
 
-// on the first addition of state and value to the render lifecycle,
-// we won't be able to type anything because we need an onChange function
-// because it needs to fire-off and it needs to update the state because the input is attached the state
-export class Search extends Component {
-  state = {
-    text: ''
-  };
+  // now we need to define our state since we are no longer working with a class, the way we bring it in is through destructuring
+  // this is transformed from the above state on line 8.
+  // within the bracket we pull out our state, in this case text, and then we create a method to change the state, which is setState
+  // /!\ it is good to use 'set' followed by the name of the state, GOOD PRACTICE
+  // then we make it equal to useState (the hook) and we set it equal to the default value and for us in this case it is empty.
+  const [text, setText] = useState(''); // the TEXT state
 
-  static propTypes = {
-    // this is a prop types function, makes the code more robust
-    searchUsers: PropTypes.func.isRequired,
-    clearUsers: PropTypes.func.isRequired,
-    showClear: PropTypes.bool.isRequired,
-    setAlert: PropTypes.func.isRequired
-  };
-
-  onSubmit = e => {
+  // this is now a function within a function bc we are no longer working with a class but with a functional component
+  const onSubmit = e => {
     e.preventDefault();
-    if (this.state.text === '') {
-      this.props.setAlert('Please enter something', 'light');
+    // no longer need this.state here anymore here as well
+    if (text === '') {
+      // now we pass in setAlert as a prop to the functional component and remove 'this.props' bc we are working with a functional component
+      setAlert('Please enter something', 'light');
     } else {
-      // searchUsers() is a function and it is being called onSubmit and we are calling a prop, and a function in the prop is called
-      // searchUsers() and then we are passing in the text
-      this.props.searchUsers(this.state.text);
-      // setting our local search text to nothing
-      this.setState({ text: '' });
+      // just need text here, again, no need for 'this.state'
+      searchUsers(text);
+      // we dont use setState here anymore, we just use setText bc of the hook we implemented & no need for 'this.' that preceded the set function
+      // we also no longer need the object like ({ text: ''}), we just leave the () as is
+      setText();
     }
   };
+  // this is now also a function
+  // const onChange = e => this.setState({ text: e.target.value });
+  // we no longer change the state with setState ^, like above, now we call setText()!
+  const onChange = e => setText(e.target.value);
+  // we also no longer need to pass in the object {} but we just make it equal to the new value (or text that was passed in)
 
-  // an arrow function that takes in an event and sets the state of the text
-  //   !!! if we had several input fields, we wouldn't want to have different onchange functions
-  //       we could use '[]' instead of 'text' with the name of the allowed input like e.target.name
-  onChange = e => this.setState({ text: e.target.value });
+  // no longer need a render bc it is a function, we now only need a return
+  // render() {
+  // const { showClear, clearUsers } = this.props; // props no longer come in like this but through the parameter of the function
 
-  render() {
-    // some destructuring here to pull out the props
-    const { showClear, clearUsers } = this.props;
-
-    return (
-      <div>
-        <form onSubmit={this.onSubmit} className='form'>
-          <input
-            type='text'
-            name='text'
-            placeholder='Search Users...'
-            value={this.state.text}
-            onChange={this.onChange} // this is needed for changing the state of the input given
-          />
-          <input
-            type='submit'
-            value='Search'
-            className='btn btn-dark btn-block'
-          />
-        </form>
-        {/* when we're calling the props clearUsers, we are sending it up to app.js where it will be catch in the <Search/> component */}
-        {/* this is an expression that is wrapped around the button, if the prop 'showClear' is true (we use the double &&) then we show the button*/}
-        {showClear && (
-          <button className='btn btn-light btn-block' onClick={clearUsers}>
-            Clear
-          </button>
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    // we no longer need 'this.' here because we are no longer working with classes
+    <div>
+      <form onSubmit={onSubmit} className='form'>
+        <input
+          type='text'
+          name='text'
+          placeholder='Search Users...'
+          // now bc we are using hooks, we no longer need 'this.stat.text' we just need to use 'text'
+          value={text}
+          onChange={onChange}
+        />
+        <input
+          type='submit'
+          value='Search'
+          className='btn btn-dark btn-block'
+        />
+      </form>
+      {showClear && (
+        <button className='btn btn-light btn-block' onClick={clearUsers}>
+          Clear
+        </button>
+      )}
+    </div>
+  );
+};
 
 export default Search;
+
+Search.propTypes = {
+  searchUsers: PropTypes.func.isRequired,
+  clearUsers: PropTypes.func.isRequired,
+  showClear: PropTypes.bool.isRequired,
+  setAlert: PropTypes.func.isRequired
+};
