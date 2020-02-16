@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
+import GithubContext from '../../context/github/githubContext';
 
 // now we are passing in our props through the function parameters , also no need for destructuring
-const Search = ({ searchUsers, showClear, clearUsers, setAlert }) => {
+const Search = ({ showClear, clearUsers, setAlert }) => {
+  // no longer need to pass in searchUsers as a prop bc of context
+
+  // here we are initializing the githubContext, useContext is a hook that we import in
+  const githubContext = useContext(GithubContext);
+
   // we can no longer do this, as in bring in state since it is a function based component,
   // NOW we bring in useState hook from 'react' like in line 1.
   // state = {
@@ -25,7 +31,7 @@ const Search = ({ searchUsers, showClear, clearUsers, setAlert }) => {
       setAlert('Please enter something', 'light');
     } else {
       // just need text here, again, no need for 'this.state'
-      searchUsers(text);
+      githubContext.searchUsers(text); // this is now part of the github context so we precede it with 'githubContext.'
       // we dont use setState here anymore, we just use setText bc of the hook we implemented & no need for 'this.' that preceded the set function
       // we also no longer need the object like ({ text: ''}), we just leave the () as is
       setText('');
@@ -69,7 +75,7 @@ const Search = ({ searchUsers, showClear, clearUsers, setAlert }) => {
 };
 
 Search.propTypes = {
-  searchUsers: PropTypes.func.isRequired,
+  // searchUsers: PropTypes.func.isRequired, // dont need this anymore bc we are bringing in GithubContext
   clearUsers: PropTypes.func.isRequired,
   showClear: PropTypes.bool.isRequired,
   setAlert: PropTypes.func.isRequired

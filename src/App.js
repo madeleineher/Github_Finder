@@ -24,17 +24,6 @@ const App = () => {
   // because we are no longer using a class we need to add const to all the following methods and now they are functions
 
   // SEARCH GITHUB USERD
-  const searchUsers = async text => {
-    // our setting function for loading and how to change the state to true
-    setLoading(true);
-    const res = await axios.get(
-      `https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-    );
-
-    // this.setState({ users: res.data.items, loading: false });
-    setUsers(res.data.items);
-    setLoading(false);
-  };
 
   // Get single Github user, this method takes in the login
   const getUser = async username => {
@@ -92,7 +81,7 @@ const App = () => {
                 render={props => (
                   <Fragment>
                     <Search
-                      searchUsers={searchUsers}
+                      // searchUsers={searchUsers} // we no longer need this because we are passing it through context
                       clearUsers={clearUsers}
                       showClear={users.length > 0 ? true : false}
                       setAlert={showAlert}

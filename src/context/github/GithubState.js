@@ -12,7 +12,6 @@ import {
   GET_REPOS,
   GET_USER
 } from '../types';
-import { deflate } from 'zlib';
 
 // now we want to create out initial state
 const GithubState = props => {
@@ -29,6 +28,20 @@ const GithubState = props => {
 
   // // these are our actions, and what we want to return here, is the provider
   // search user
+  const searchUsers = async text => {
+    // now we can just call setLoading, we no longer need to pass a parameter
+    setLoading();
+
+    const res = await axios.get(
+      `https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+
+    // setLoading(false); // we don't need this anymore
+    dispatch({
+      type: SEARCH_USERS, // we want to have a type
+      payload: res.data.items // the payload is the data we want to send, the reducer will send this to any thing that needs it
+    });
+  };
 
   // get user
 
@@ -37,6 +50,9 @@ const GithubState = props => {
   // clear users
 
   // set loading
+  //    all we want this to do, it to dispatch to our reducer, and we do that with dispatch that was pulled from the useReducer hook
+  //    and what we dispatch in this case is an object, that must have a type and the reducer is going to catch the object
+  const setLoading = () => dispatch({ type: SET_LOADING });
 
   // this is the provider, which we are basically wrapping around our entire program
   // this provider is going to take in a prop which is given to value as an object
@@ -47,7 +63,8 @@ const GithubState = props => {
         users: state.users,
         user: state.user,
         repos: state.repos,
-        loading: state.loading
+        loading: state.loading,
+        searchUsers
       }}
     >
       {props.children}
