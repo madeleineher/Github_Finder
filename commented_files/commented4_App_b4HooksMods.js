@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react'; // useState now bc of hooks, we took out components
+import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 // import UserItem from './components/users/UserItem';
@@ -8,83 +8,75 @@ import axios from 'axios'; // need to import packages here also
 import Search from './components/users/Search';
 import Alert from './components/layout/Alert';
 import About from './components/pages/About';
-// in the following line we are bringing in our github state
-import GithubState from './context/github/GithubState';
 import './App.css';
 
-// turning the app class into a function
-const App = () => {
-  // how to set state within a function, note the 'set' before each keyword
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState({});
-  const [repos, setRepos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
-
-  // because we are no longer using a class we need to add const to all the following methods and now they are functions
+class App extends Component {
+  state = {
+    users: [],
+    user: {},
+    repos: [],
+    loading: false,
+    alert: null
+  };
 
   // SEARCH GITHUB USERD
-  const searchUsers = async text => {
-    // our setting function for loading and how to change the state to true
-    setLoading(true);
+  searchUsers = async text => {
+    this.setState({ loading: true });
     const res = await axios.get(
       `https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    // this.setState({ users: res.data.items, loading: false });
-    setUsers(res.data.items);
-    setLoading(false);
+    this.setState({ users: res.data.items, loading: false });
   };
 
   // Get single Github user, this method takes in the login
-  const getUser = async username => {
-    setLoading(true);
+  getUser = async username => {
+    this.setState({ loading: true });
 
     // and then sends a request and get that user's info
     const res = await axios.get(
       `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    setRepos(res.data);
-    setLoading(true);
+    // and then fill the user's state with the response
+    this.setState({ user: res.data, loading: false });
+
+    // and then we are passing the user's state back into the USER component below (that comes after About) in 'user={user}',
+    // from that we will have access to the user's info
   };
 
-  const getUserRepos = async username => {
-    setLoading(true);
+  getUserRepos = async username => {
+    this.setState({ loading: true });
 
     const res = await axios.get(
       `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    setUser(res.data);
-    setLoading(false);
+    this.setState({ repos: res.data, loading: false });
   };
 
   // Clear users from state
-  const clearUsers = () => {
-    setUsers([]);
-    setLoading(false);
-  };
+  clearUsers = () => this.setState({ users: [], loading: false });
 
   // Set Alert
-  const showAlert = (msg, type) => {
-    // this.setState({ alert: { msg, type } });
-    setAlert({ msg, type });
+  setAlert = (msg, type) => {
+    this.setState({ alert: { msg, type } });
 
-    setTimeout(() => setAlert(null), 5000);
+    setTimeout(() => this.setState({ alert: null }), 5000);
   };
 
   // trying to add clear button here
-  const clearAlert = alert => setAlert(null);
+  clearAlert = alert => this.setState({ alert: null });
 
-  return (
-    // here is the provider wrapping around our entire application
-    <GithubState>
+  render() {
+    const { users, user, repos, loading } = this.state;
+
+    return (
       <Router>
         <div className='App'>
           <Navbar />
           <div className='container'>
-            <Alert alert={alert} clearAlert={clearAlert} />
+            <Alert alert={this.state.alert} clearAlert={this.clearAlert} />
             <Switch>
               <Route
                 exact
@@ -92,24 +84,29 @@ const App = () => {
                 render={props => (
                   <Fragment>
                     <Search
-                      searchUsers={searchUsers}
-                      clearUsers={clearUsers}
+                      searchUsers={this.searchUsers}
+                      clearUsers={this.clearUsers}
                       showClear={users.length > 0 ? true : false}
-                      setAlert={showAlert}
+                      setAlert={this.setAlert}
                     />
                     <Users loading={loading} users={users} />
                   </Fragment>
                 )}
               />
               <Route exact path='/about' component={About} />
+              {/* ':login' is used to know which user it is and is passed in as part of the URL  */}
               <Route
                 exact
                 path='/user/:login'
                 render={props => (
+                  // inside here we want to render the user component, and the stuff we need to pass in, is the props
+                  // the adding the getUser because we are calling this prop from the component which is the method we created in the beginning
+                  // and then we add the user state (which is destructured, so we don't need this)
+                  // lastly we pass in loading if the user hasnt been searched yet
                   <User
                     {...props}
-                    getUser={getUser}
-                    getUserRepos={getUserRepos}
+                    getUser={this.getUser}
+                    getUserRepos={this.getUserRepos}
                     user={user}
                     repos={repos}
                     loading={loading}
@@ -120,8 +117,8 @@ const App = () => {
           </div>
         </div>
       </Router>
-    </GithubState>
-  );
-};
+    );
+  }
+}
 
 export default App;

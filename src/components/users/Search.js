@@ -28,7 +28,7 @@ const Search = ({ searchUsers, showClear, clearUsers, setAlert }) => {
       searchUsers(text);
       // we dont use setState here anymore, we just use setText bc of the hook we implemented & no need for 'this.' that preceded the set function
       // we also no longer need the object like ({ text: ''}), we just leave the () as is
-      setText();
+      setText('');
     }
   };
   // this is now also a function
@@ -68,11 +68,11 @@ const Search = ({ searchUsers, showClear, clearUsers, setAlert }) => {
   );
 };
 
-export default Search;
-
 Search.propTypes = {
   searchUsers: PropTypes.func.isRequired,
   clearUsers: PropTypes.func.isRequired,
   showClear: PropTypes.bool.isRequired,
   setAlert: PropTypes.func.isRequired
 };
+
+export default Search;
