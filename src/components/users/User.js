@@ -1,16 +1,21 @@
-import React, { Fragment, useEffect } from 'react'; // import componenet, fragments, hooks, etc. here !
+import React, { Fragment, useEffect, useContext } from 'react'; // import componenet, fragments, hooks, etc. here !
 import Spinner from '../layout/Spinner';
 import Repos from '../repos/Repos';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import GithubContext from '../../context/github/githubContext';
 
-const User = ({ user, loading, repos, getUser, getUserRepos, match }) => {
+const User = ({ match }) => {
   // because we are using hooks we can't use componentDidMount bc it is a lifecycle method that can only be used in a class
   // to overcome this, we use 'useEffect'
   // componentDidMount() { // the way we did it before with a class
   //   this.props.getUser(match.params.login);
   //   this.props.getUserRepos(match.params.login);
   // }
+
+  const githubContext = useContext(GithubContext);
+
+  const { getUser, loading, user, repos, getUserRepos } = githubContext;
+
   // with useEffect, you pass in  an arrow function, and you dont want to necessarily return anything directly,
   // you wanna open up the curly braces and place the method inside
   // useEffect constantly runs in a loop, we can stop that by adding an empty set of brackets
@@ -105,14 +110,6 @@ const User = ({ user, loading, repos, getUser, getUserRepos, match }) => {
       <Repos repos={repos} />
     </Fragment>
   );
-};
-
-User.propTypes = {
-  loading: PropTypes.bool,
-  user: PropTypes.object.isRequired,
-  repos: PropTypes.array.isRequired,
-  getUser: PropTypes.func.isRequired,
-  getUserRepos: PropTypes.func.isRequired
 };
 
 export default User;

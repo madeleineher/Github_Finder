@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react'; // bringing in the useContext hook here
 import UserItem from './UserItem';
 import Spinner from '../layout/Spinner';
-import PropTypes from 'prop-types';
+// bring this in with an uppercase 'G' and initialize it with a lowercase 'g'
+import GithubContext from '../../context/github/githubContext';
 
-// the users are coming in as props, not states, which is why we use props and not state
-//  this was changed from a class to a functional component because there is no state
-//   and it is just being passed in props.
-// the props being passed into Users are using the destructering method,
-//  where we are just pulling out the props
-const Users = ({ users, loading }) => {
+// we dont need to pass in props anymore because we are pull them from the githubContext
+const Users = () => {
+  // initializing the github context here, this and the imports will give use access to anything in the GithubContext, this is why we don't need to pass arguments anymore from the App level
+  const githubContext = useContext(GithubContext);
+
+  // destructuring from githubContext, instead of adding githubContext to the props below
+  const { users, loading } = githubContext;
+
   if (loading) {
     return <Spinner />;
   } else {
@@ -22,10 +25,11 @@ const Users = ({ users, loading }) => {
   }
 };
 
-Users.propTypes = {
-  users: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired
-};
+// we dont need this anymore because it is no longer coming from props anymore, it is coming from context now
+// Users.propTypes = {
+//   users: PropTypes.array.isRequired,
+//   loading: PropTypes.bool.isRequired
+// };
 
 // this is our created variable to our styled object
 const userStyle = {

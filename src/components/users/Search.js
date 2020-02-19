@@ -1,13 +1,14 @@
 import React, { useState, useContext } from 'react';
-import PropTypes from 'prop-types';
 import GithubContext from '../../context/github/githubContext';
+import AlertContext from '../../context/alert/alertContext';
 
 // now we are passing in our props through the function parameters , also no need for destructuring
-const Search = ({ showClear, clearUsers, setAlert }) => {
+const Search = () => {
   // no longer need to pass in searchUsers as a prop bc of context
 
   // here we are initializing the githubContext, useContext is a hook that we import in
   const githubContext = useContext(GithubContext);
+  const alertContext = useContext(AlertContext);
 
   // we can no longer do this, as in bring in state since it is a function based component,
   // NOW we bring in useState hook from 'react' like in line 1.
@@ -28,7 +29,7 @@ const Search = ({ showClear, clearUsers, setAlert }) => {
     // no longer need this.state here anymore here as well
     if (text === '') {
       // now we pass in setAlert as a prop to the functional component and remove 'this.props' bc we are working with a functional component
-      setAlert('Please enter something', 'light');
+      alertContext.setAlert('Please enter something', 'light');
     } else {
       // just need text here, again, no need for 'this.state'
       githubContext.searchUsers(text); // this is now part of the github context so we precede it with 'githubContext.'
@@ -65,20 +66,16 @@ const Search = ({ showClear, clearUsers, setAlert }) => {
           className='btn btn-dark btn-block'
         />
       </form>
-      {showClear && (
-        <button className='btn btn-light btn-block' onClick={clearUsers}>
+      {githubContext.users.length > 0 && (
+        <button
+          className='btn btn-light btn-block'
+          onClick={githubContext.clearUsers}
+        >
           Clear
         </button>
       )}
     </div>
   );
-};
-
-Search.propTypes = {
-  // searchUsers: PropTypes.func.isRequired, // dont need this anymore bc we are bringing in GithubContext
-  clearUsers: PropTypes.func.isRequired,
-  showClear: PropTypes.bool.isRequired,
-  setAlert: PropTypes.func.isRequired
 };
 
 export default Search;

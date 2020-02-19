@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import AlertContext from '../../context/alert/alertContext';
 
 // this is a functional component that that is the alert parameter (which is an object with a message and type)
-const Alert = ({ alert, clearAlert }) => {
+const Alert = () => {
+  // clearAlert
+  const alertContext = useContext(AlertContext);
+
+  const { alert, clearAlert } = alertContext;
+
   return (
     alert !== null && (
       // the alert is based off of the type passed in, which is a prop

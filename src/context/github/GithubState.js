@@ -44,10 +44,36 @@ const GithubState = props => {
   };
 
   // get user
+  const getUser = async username => {
+    setLoading();
+
+    const res = await axios.get(
+      `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+
+    dispatch({
+      type: GET_USER,
+      payload: res.data
+    });
+  };
 
   // get repos
+  const getUserRepos = async username => {
+    setLoading();
 
-  // clear users
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+
+    dispatch({
+      type: GET_REPOS,
+      payload: res.data
+    });
+  };
+
+  // Clear users from state
+  // dispatching a type to the reducer
+  const clearUsers = () => dispatch({ type: CLEAR_USERS });
 
   // set loading
   //    all we want this to do, it to dispatch to our reducer, and we do that with dispatch that was pulled from the useReducer hook
@@ -64,7 +90,10 @@ const GithubState = props => {
         user: state.user,
         repos: state.repos,
         loading: state.loading,
-        searchUsers
+        searchUsers,
+        clearUsers,
+        getUser,
+        getUserRepos
       }}
     >
       {props.children}
