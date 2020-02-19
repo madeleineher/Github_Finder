@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import User from '../users/User';
 import Search from '../users/Search';
 import Users from '../users/Users';
 
